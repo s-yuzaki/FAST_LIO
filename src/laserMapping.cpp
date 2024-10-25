@@ -897,18 +897,18 @@ int main(int argc, char** argv)
         nh.subscribe(lid_topic, 10, livox_pcl_cbk) : \
         nh.subscribe(lid_topic, 10, standard_pcl_cbk);
     ros::Subscriber sub_imu = nh.subscribe(imu_topic, 10, imu_cbk);
-    // ros::Publisher pubLaserCloudFull = nh.advertise<sensor_msgs::PointCloud2>
-    //         ("cloud_registered", 100000);
-    // ros::Publisher pubLaserCloudFull_body = nh.advertise<sensor_msgs::PointCloud2>
-    //         ("cloud_registered_body", 100000);
-    // ros::Publisher pubLaserCloudEffect = nh.advertise<sensor_msgs::PointCloud2>
-    //         ("cloud_effected", 100000);
-    // ros::Publisher pubLaserCloudMap = nh.advertise<sensor_msgs::PointCloud2>
-    //         ("Laser_map", 100000);
+    ros::Publisher pubLaserCloudFull = nh.advertise<sensor_msgs::PointCloud2>
+            ("cloud_registered", 100000);
+    ros::Publisher pubLaserCloudFull_body = nh.advertise<sensor_msgs::PointCloud2>
+            ("cloud_registered_body", 100000);
+    ros::Publisher pubLaserCloudEffect = nh.advertise<sensor_msgs::PointCloud2>
+            ("cloud_effected", 100000);
+    ros::Publisher pubLaserCloudMap = nh.advertise<sensor_msgs::PointCloud2>
+            ("Laser_map", 100000);
     ros::Publisher pubOdomAftMapped = nh.advertise<nav_msgs::Odometry> 
             ("Odometry", 10);
-    // ros::Publisher pubPath          = nh.advertise<nav_msgs::Path> 
-    //         ("path", 100000);
+    ros::Publisher pubPath          = nh.advertise<nav_msgs::Path> 
+            ("path", 100000);
     pubPrecedeOdom = nh.advertise<simple_msgs::Odometry>("Odometry_precede", 10);
 //------------------------------------------------------------------------------------------------------
     signal(SIGINT, SigHandle);
@@ -919,10 +919,11 @@ int main(int argc, char** argv)
     {
         auto now_time = ros::Time::now();
         double elapsed_time_ms = (now_time - pre_time).toSec() * 1000;
-        if(elapsed_time_ms > 0.5){
+        if(elapsed_time_ms > 5.0){
             std::cout << "loop time:" << elapsed_time_ms << "[ms]" << std::endl;
         }
         pre_time = now_time;
+
         if (flg_exit) break;
         ros::spinOnce();
         if(sync_packages(Measures)) 
@@ -1058,9 +1059,9 @@ int main(int argc, char** argv)
             t5 = omp_get_wtime();
 
             /******* Publish points *******/
-            // if (path_en)                         publish_path(pubPath);
-            // if (scan_pub_en || pcd_save_en)      publish_frame_world(pubLaserCloudFull);
-            // if (scan_pub_en && scan_body_pub_en) publish_frame_body(pubLaserCloudFull_body);
+            if (path_en)                         publish_path(pubPath);
+            if (scan_pub_en || pcd_save_en)      publish_frame_world(pubLaserCloudFull);
+            if (scan_pub_en && scan_body_pub_en) publish_frame_body(pubLaserCloudFull_body);
             // publish_effect_world(pubLaserCloudEffect);
             // publish_map(pubLaserCloudMap);
 
