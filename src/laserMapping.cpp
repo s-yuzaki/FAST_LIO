@@ -45,6 +45,7 @@
 #include <Eigen/Core>
 #include "IMU_Processing.hpp"
 #include <nav_msgs/Odometry.h>
+#include <simple_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <visualization_msgs/Marker.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -384,24 +385,24 @@ void imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
     if (p_imu->getImuInit())
       {
         // publish
-        nav_msgs::Odometry odom_msg;
+        simple_msgs::Odometry odom_msg;
         odom_msg.header.frame_id = "camera_init";
         odom_msg.child_frame_id = "body";
         odom_msg.header.stamp = msg->header.stamp;
         auto kf_pre_state = kf_pre.get_x();
-        odom_msg.pose.pose.position.x = kf_pre_state.pos(0);
-        odom_msg.pose.pose.position.y = kf_pre_state.pos(1);
-        odom_msg.pose.pose.position.z = kf_pre_state.pos(2);
-        odom_msg.pose.pose.orientation.x = kf_pre_state.rot.coeffs()[0];
-        odom_msg.pose.pose.orientation.y = kf_pre_state.rot.coeffs()[1];
-        odom_msg.pose.pose.orientation.z = kf_pre_state.rot.coeffs()[2];
-        odom_msg.pose.pose.orientation.w = kf_pre_state.rot.coeffs()[3];
-        odom_msg.twist.twist.linear.x = kf_pre_state.vel(0);
-        odom_msg.twist.twist.linear.y = kf_pre_state.vel(1);
-        odom_msg.twist.twist.linear.z = kf_pre_state.vel(2);
-        odom_msg.twist.twist.angular.x = msg->angular_velocity.x - kf_pre_state.bg(0);
-        odom_msg.twist.twist.angular.y = msg->angular_velocity.y - kf_pre_state.bg(1);
-        odom_msg.twist.twist.angular.z = msg->angular_velocity.z - kf_pre_state.bg(2);
+        odom_msg.pose.position.x = kf_pre_state.pos(0);
+        odom_msg.pose.position.y = kf_pre_state.pos(1);
+        odom_msg.pose.position.z = kf_pre_state.pos(2);
+        odom_msg.pose.orientation.x = kf_pre_state.rot.coeffs()[0];
+        odom_msg.pose.orientation.y = kf_pre_state.rot.coeffs()[1];
+        odom_msg.pose.orientation.z = kf_pre_state.rot.coeffs()[2];
+        odom_msg.pose.orientation.w = kf_pre_state.rot.coeffs()[3];
+        odom_msg.twist.linear.x = kf_pre_state.vel(0);
+        odom_msg.twist.linear.y = kf_pre_state.vel(1);
+        odom_msg.twist.linear.z = kf_pre_state.vel(2);
+        odom_msg.twist.angular.x = msg->angular_velocity.x - kf_pre_state.bg(0);
+        odom_msg.twist.angular.y = msg->angular_velocity.y - kf_pre_state.bg(1);
+        odom_msg.twist.angular.z = msg->angular_velocity.z - kf_pre_state.bg(2);
         pubPrecedeOdom.publish(odom_msg);
       }
 
@@ -908,7 +909,7 @@ int main(int argc, char** argv)
             ("Odometry", 10);
     // ros::Publisher pubPath          = nh.advertise<nav_msgs::Path> 
     //         ("path", 100000);
-    pubPrecedeOdom = nh.advertise<nav_msgs::Odometry>("Odometry_precede", 10);
+    pubPrecedeOdom = nh.advertise<simple_msgs::Odometry>("Odometry_precede", 10);
 //------------------------------------------------------------------------------------------------------
     signal(SIGINT, SigHandle);
     ros::Rate rate(5000);
